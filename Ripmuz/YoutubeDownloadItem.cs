@@ -96,8 +96,8 @@ namespace Ripmuz
 			if (File.Exists(tempFilename))
 				File.Delete(tempFilename);
 
-			if (Form1.destFolder != Directory.GetCurrentDirectory() && File.Exists(filename))
-				File.Move(filename, Form1.destFolder + "\\" + filename);
+			if (Form1.settings.DestinationFolder != Directory.GetCurrentDirectory() && File.Exists(filename))
+				File.Move(filename, Form1.settings.DestinationFolder + "\\" + filename);
 		}
 
 		// FFMPEG
@@ -192,6 +192,7 @@ namespace Ripmuz
 
 		protected void FillInfosFromJson()
 		{
+			// winforms don't seem to be able to display .webp images :/
 			var thumbnails = (JArray)infosJSONObject.GetValue("thumbnails");
 			var thumbnailURL = (JValue)((JObject)thumbnails[0]).GetValue("url");
 			thumbnailPictureBox.ImageLocation = thumbnailURL.Value<string>();

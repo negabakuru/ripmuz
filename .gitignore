@@ -350,3 +350,5 @@ MigrationBackup/
 .ionide/
 
 Ripmuz/ThirdPartyBin/*
+
+Ripmuz/Ripmuz.exe

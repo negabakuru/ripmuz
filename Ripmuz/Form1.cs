@@ -10,14 +10,22 @@ using System.Threading.Tasks;
 using System.Windows.Forms;
 
 using System.IO;
+using Newtonsoft.Json;
+using Newtonsoft.Json.Linq;
+using System.Threading;
 
 namespace Ripmuz
 {
+	public class SettingsObject
+    {
+		public string DestinationFolder { get; set; }
+    }
+
 	public partial class Form1 : Form
 	{
 		// VAR
-
-		static public string destFolder;
+		static protected string settingsFilePath = "RipmuzSettings.json";
+		static public SettingsObject settings { get; set; }
 
 		public Process youtubedl = new Process();
 
@@ -28,12 +36,18 @@ namespace Ripmuz
 		{
 			InitializeComponent();
 
-			destFolder = Directory.GetCurrentDirectory();
-			destFolderLabel.Text = "Dest folder: " + destFolder;
+			LoadSettingsFromFile();
+
+			if (settings.DestinationFolder == "" || settings.DestinationFolder == null || !Directory.Exists(settings.DestinationFolder))
+				settings.DestinationFolder = Directory.GetCurrentDirectory();
+			destFolderLabel.Text = "Dest folder: " + settings.DestinationFolder;
+
+			SaveSettingsToFile();
 
 			youtubedl.StartInfo.FileName = "./ThirdPartyBin/youtube-dl.exe";
 			youtubedl.StartInfo.UseShellExecute = false;
 			youtubedl.StartInfo.CreateNoWindow = true;
+			youtubedl.StartInfo.RedirectStandardInput = true;
 			youtubedl.StartInfo.RedirectStandardOutput = true;
 			youtubedl.StartInfo.RedirectStandardError = true;
 			youtubedl.EnableRaisingEvents = true;
@@ -44,7 +58,41 @@ namespace Ripmuz
 			UpdateYoutubeDL();
 		}
 
-		private void urlTextBox_TextChanged(object sender, EventArgs e)
+        public bool LoadSettingsFromFile()
+        {
+            // read JSON directly from a file
+            if (File.Exists(settingsFilePath))
+            {
+                var serializer = new JsonSerializer();
+                using (StreamReader file = File.OpenText(settingsFilePath))
+                {
+                    settings = (SettingsObject)serializer.Deserialize(file, typeof(SettingsObject));
+                }
+
+				if (settings == null) // ensure we have usable settings at least
+					settings = new SettingsObject();
+
+                return true;
+            }
+
+			// ensure we have usable settings at least
+			settings = new SettingsObject();
+            return false;
+        }
+
+        public bool SaveSettingsToFile()
+        {
+            // serialize JSON directly to a file
+            using (StreamWriter file = File.CreateText(settingsFilePath))
+            {
+                JsonSerializer serializer = new JsonSerializer();
+                serializer.Serialize(file, settings);
+            }
+
+            return true;
+        }
+
+        private void urlTextBox_TextChanged(object sender, EventArgs e)
 		{
 			if (urlTextBox.Text.Contains("youtu.be") || urlTextBox.Text.Contains("youtube.com"))
 			{
@@ -83,15 +131,43 @@ namespace Ripmuz
 				{
 				}
 
-				youtubedl.CancelOutputRead();
-				youtubedl.CancelErrorRead();
-				youtubedl.Close();
+				try
+                {
+					youtubedl.CancelOutputRead();
+					youtubedl.CancelErrorRead();
+                }
+				catch (System.InvalidOperationException)
+                {
+                    richTextBox1.AppendText("\nFailed cancelling youtube-dl Output/Error read.");
+                    richTextBox1.SelectionStart = richTextBox1.Text.Length;
+                    richTextBox1.ScrollToCaret();
+                }
+                youtubedl.Close();
 			}
 		}
 
 		public void OnYoutubeDLOutput(object sender, DataReceivedEventArgs e)
 		{
-			if (richTextBox1.InvokeRequired)
+
+            if (e.Data != null && e.Data.Length > 0 && e.Data.Contains("Waiting for file handle to be closed")) // Need to close youtube-dl
+            {
+				youtubedl.StandardInput.WriteLine();
+				youtubedl.StandardInput.Flush();
+
+                Thread.Sleep(4000);
+
+                //youtubedl.CancelOutputRead();
+                //youtubedl.CancelErrorRead();
+                youtubedl.Close();
+
+                //// is this enough ?
+
+                youtubedl.Start();
+                //youtubedl.BeginOutputReadLine();
+                //youtubedl.BeginErrorReadLine();
+            }
+
+            if (richTextBox1.InvokeRequired)
 			{
 				DataReceivedEventHandler d = new DataReceivedEventHandler(OnYoutubeDLOutput);
 				richTextBox1.Invoke(d, new object[] { sender, e });
@@ -142,8 +218,10 @@ namespace Ripmuz
 		private void chooseDestFolderButton_Click(object sender, EventArgs e)
 		{
 			destFolderBrowserDialog.ShowDialog();
-			destFolder = destFolderBrowserDialog.SelectedPath;
-			destFolderLabel.Text = "Dest folder: " + destFolder;
+			Form1.settings.DestinationFolder = destFolderBrowserDialog.SelectedPath;
+			destFolderLabel.Text = "Dest folder: " + Form1.settings.DestinationFolder;
+
+			SaveSettingsToFile();
 		}
 	}
 }
