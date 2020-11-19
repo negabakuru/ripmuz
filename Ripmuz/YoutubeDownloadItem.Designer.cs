@@ -138,7 +138,7 @@
             this.fromToPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 33.62069F));
             this.fromToPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 66.37931F));
             this.fromToPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 70F));
-            this.fromToPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 158F));
+            this.fromToPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 159F));
             this.fromToPanel.Controls.Add(this.fromLabel, 0, 0);
             this.fromToPanel.Controls.Add(this.toLabel, 2, 0);
             this.fromToPanel.Controls.Add(this.fromTextBox, 1, 0);
@@ -169,7 +169,7 @@
             this.toLabel.AutoSize = true;
             this.toLabel.Dock = System.Windows.Forms.DockStyle.Right;
             this.toLabel.Font = new System.Drawing.Font("Microsoft Sans Serif", 10F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.toLabel.Location = new System.Drawing.Point(270, 0);
+            this.toLabel.Location = new System.Drawing.Point(269, 0);
             this.toLabel.Name = "toLabel";
             this.toLabel.Size = new System.Drawing.Size(25, 32);
             this.toLabel.TabIndex = 1;
@@ -184,7 +184,7 @@
             this.fromTextBox.Location = new System.Drawing.Point(79, 3);
             this.fromTextBox.Multiline = false;
             this.fromTextBox.Name = "fromTextBox";
-            this.fromTextBox.Size = new System.Drawing.Size(146, 26);
+            this.fromTextBox.Size = new System.Drawing.Size(145, 26);
             this.fromTextBox.TabIndex = 2;
             this.fromTextBox.Text = "00:00:00";
             // 
@@ -192,9 +192,9 @@
             // 
             this.toTextBox.Dock = System.Windows.Forms.DockStyle.Fill;
             this.toTextBox.Font = new System.Drawing.Font("Microsoft Sans Serif", 12F, System.Drawing.FontStyle.Regular, System.Drawing.GraphicsUnit.Point, ((byte)(0)));
-            this.toTextBox.Location = new System.Drawing.Point(301, 3);
+            this.toTextBox.Location = new System.Drawing.Point(300, 3);
             this.toTextBox.Name = "toTextBox";
-            this.toTextBox.Size = new System.Drawing.Size(153, 26);
+            this.toTextBox.Size = new System.Drawing.Size(154, 26);
             this.toTextBox.TabIndex = 3;
             this.toTextBox.Text = "00:00:00";
             // 

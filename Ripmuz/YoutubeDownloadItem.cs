@@ -40,7 +40,9 @@ namespace Ripmuz
 		protected JObject infosJSONObject;
 		protected string url;
 		protected string filename;
-		protected string tempFilename;
+		protected string outputFilePath;
+		protected string tempFileName;
+		protected string tempFilePath;
 		protected int duration;
 
 
@@ -93,11 +95,13 @@ namespace Ripmuz
 
 		protected void CleanUpFiles()
 		{
-			if (File.Exists(tempFilename))
-				File.Delete(tempFilename);
+			if (File.Exists(tempFilePath))
+				File.Delete(tempFilePath);
 
-			if (Form1.settings.DestinationFolder != Directory.GetCurrentDirectory() && File.Exists(filename))
-				File.Move(filename, Form1.settings.DestinationFolder + "\\" + filename);
+            //if (Form1.settings.DestinationFolder != Directory.GetCurrentDirectory() && File.Exists(filename))
+			// Move output from temp folder to destination folder
+            if (File.Exists(Path.Combine(Form1.tempFolderPath, filename)))
+				File.Move(Path.Combine(Form1.tempFolderPath, filename), Path.Combine(Form1.settings.DestinationFolder, filename));
 		}
 
 		// FFMPEG
@@ -113,19 +117,19 @@ namespace Ripmuz
 			// sample: "-i \"test.mp3\" -y -c:a copy -ss 00:00:00 -to 00:01:00 -metadata title=\"To Be Heroine OP\" -metadata artist=\"Dunno\" \"ok.mp3\""
 			if (fromTextBox.Text != "00:00:00" || toTextBox.Text != TimeSpan.FromSeconds(duration).ToString(@"hh\:mm\:ss"))
 			{
-				ffmpeg.StartInfo.Arguments = "-i \"" + tempFilename + "\" -y -c:a copy ";
+				ffmpeg.StartInfo.Arguments = "-i \"" + tempFilePath + "\" -y -c:a copy ";
 				ffmpeg.StartInfo.Arguments += "-ss " + fromTextBox.Text + " -to " + toTextBox.Text + " ";
 				ffmpeg.StartInfo.Arguments += "-metadata title=\"" + title + "\" ";
 				ffmpeg.StartInfo.Arguments += "-metadata artist=\"" + artist + "\" ";
-				ffmpeg.StartInfo.Arguments += "\"" + filename + "\"";
+				ffmpeg.StartInfo.Arguments += "\"" + outputFilePath + "\"";
 				Console.WriteLine("time " + ffmpeg.StartInfo.Arguments);
 			}
 			else
 			{
-				ffmpeg.StartInfo.Arguments = "-i \"" + tempFilename + "\" -y -c:a copy ";
+				ffmpeg.StartInfo.Arguments = "-i \"" + tempFilePath + "\" -y -c:a copy ";
 				ffmpeg.StartInfo.Arguments += "-metadata title=\"" + title + "\" ";
 				ffmpeg.StartInfo.Arguments += "-metadata artist=\"" + artist + "\" ";
-				ffmpeg.StartInfo.Arguments += "\"" + filename + "\"";
+				ffmpeg.StartInfo.Arguments += "\"" + outputFilePath + "\"";
 				Console.WriteLine("norm " + ffmpeg.StartInfo.Arguments);
 			}
 
@@ -183,7 +187,7 @@ namespace Ripmuz
 		{
 			status = DLStatus.Downloading;
 
-			youtubedl.StartInfo.Arguments = "--newline -f bestaudio -x --audio-format mp3 --audio-quality 0 --embed-thumbnail -o \"%(title)s_temp.%(ext)s\" \"" + this.url + "\"";
+			youtubedl.StartInfo.Arguments = "--newline -f bestaudio -x --audio-format mp3 --audio-quality 0 --embed-thumbnail -o \"" + Form1.tempFolderPath + "%(title)s_temp.%(ext)s\" \"" + this.url + "\"";
 
 			youtubedl.Start();
 			youtubedl.BeginOutputReadLine();
@@ -194,18 +198,36 @@ namespace Ripmuz
 		{
 			// winforms don't seem to be able to display .webp images :/
 			var thumbnails = (JArray)infosJSONObject.GetValue("thumbnails");
-			var thumbnailURL = (JValue)((JObject)thumbnails[0]).GetValue("url");
-			thumbnailPictureBox.ImageLocation = thumbnailURL.Value<string>();
+			// Avoid .webp images since they're not natively supported
+			string thumbnailURL = "";
+			int maxHeight = 0;
+			for (int i = 0; i < thumbnails.Count; ++i)
+			{
+				var curThumb = (JObject)thumbnails[i];
+				if (curThumb.GetValue("url").ToString().ToLower().Contains(".webp") == false &&
+					((JValue)curThumb.GetValue("height")).Value<int>() > maxHeight)
+				{
+					maxHeight = ((JValue)curThumb.GetValue("height")).Value<int>();
+					thumbnailURL = ((JValue)curThumb.GetValue("url")).Value<string>();
+					if (thumbnailURL.IndexOf('?') > -1)
+						thumbnailURL = thumbnailURL.Remove(thumbnailURL.IndexOf('?'), (thumbnailURL.Length - thumbnailURL.IndexOf('?')));
+				}
+			}
 
-			tempFilename = ((JValue)infosJSONObject.GetValue("_filename")).Value<string>();
-			tempFilename = tempFilename.Substring(0, tempFilename.LastIndexOf('.') + 1) + "mp3";
+			//thumbnailPictureBox.ImageLocation = thumbnailURL;
+			thumbnailPictureBox.LoadAsync(thumbnailURL);
+
+            tempFileName = ((JValue)infosJSONObject.GetValue("_filename")).Value<string>();
+			tempFileName = tempFileName.Substring(0, tempFileName.LastIndexOf('.') + 1) + "mp3";
 			foreach (char c in System.IO.Path.GetInvalidFileNameChars())
-				tempFilename = tempFilename.Replace(c, ' ');
+				tempFileName = tempFileName.Replace(c, ' ');
+			tempFilePath = Path.Combine(Form1.tempFolderPath, tempFileName);
 
 			string title = ((JValue)infosJSONObject.GetValue("title")).Value<string>();
 			filename = title + ".mp3";
 			foreach (char c in System.IO.Path.GetInvalidFileNameChars())
 				filename = filename.Replace(c, ' ');
+			outputFilePath = Path.Combine(Form1.tempFolderPath, filename);
 			titleTextBox.Text = title;
 
 			var artist = (JValue)infosJSONObject.GetValue("artist");
@@ -222,10 +244,10 @@ namespace Ripmuz
 				statusLabel.Invoke(new EventHandler(OnYoutubeDLExit), new object[] { sender, e });
 			else if (status == DLStatus.GettingInfos)
 			{
-				// ready to download
-				statusLabel.Text = "Ready";
-				startButton.Visible = true;
-				FillInfosFromJson();
+				//// ready to download
+				//statusLabel.Text = "Ready";
+				//startButton.Visible = true;
+				//FillInfosFromJson();
 
 				youtubedl.CancelOutputRead();
 				youtubedl.CancelErrorRead();
@@ -258,8 +280,13 @@ namespace Ripmuz
 			else if (status == DLStatus.GettingInfos && !string.IsNullOrEmpty(e.Data))
 			{
 				infosJSONObject = JObject.Parse(e.Data);
-			}
-			else if (status == DLStatus.Downloading && !string.IsNullOrEmpty(e.Data))
+
+                // ready to download
+                FillInfosFromJson();
+                statusLabel.Text = "Ready";
+                startButton.Visible = true;
+            }
+            else if (status == DLStatus.Downloading && !string.IsNullOrEmpty(e.Data))
 			{
 				if (e.Data.Contains("[download] "))
 				{

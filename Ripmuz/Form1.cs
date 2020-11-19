@@ -16,14 +16,16 @@ using System.Threading;
 
 namespace Ripmuz
 {
-	public class SettingsObject
-    {
-		public string DestinationFolder { get; set; }
-    }
 
 	public partial class Form1 : Form
 	{
+		public class SettingsObject
+		{
+			public string DestinationFolder { get; set; }
+		}
+
 		// VAR
+		static public string tempFolderPath { get; protected set; }
 		static protected string settingsFilePath = "RipmuzSettings.json";
 		static public SettingsObject settings { get; set; }
 
@@ -32,11 +34,15 @@ namespace Ripmuz
 
 		// FUNC
 
+		// TODO: Maybe use https://github.com/SnGmng/YoutubeDL-NET for youtube-dl
+		//		 and a nuget ffmpeg package too
 		public Form1()
 		{
 			InitializeComponent();
 
-			LoadSettingsFromFile();
+			tempFolderPath = Path.Combine(Path.GetTempPath(), @"Ripmuz\");
+            settingsFilePath = Path.Combine(Environment.GetFolderPath(Environment.SpecialFolder.LocalApplicationData), @"Ripmuz\RipmuzSettings.json");
+            LoadSettingsFromFile();
 
 			if (settings.DestinationFolder == "" || settings.DestinationFolder == null || !Directory.Exists(settings.DestinationFolder))
 				settings.DestinationFolder = Directory.GetCurrentDirectory();
@@ -60,8 +66,8 @@ namespace Ripmuz
 
         public bool LoadSettingsFromFile()
         {
-            // read JSON directly from a file
-            if (File.Exists(settingsFilePath))
+			// read JSON directly from a file
+			if (File.Exists(settingsFilePath))
             {
                 var serializer = new JsonSerializer();
                 using (StreamReader file = File.OpenText(settingsFilePath))
@@ -82,6 +88,9 @@ namespace Ripmuz
 
         public bool SaveSettingsToFile()
         {
+			if (Path.GetDirectoryName(settingsFilePath).Length > 0)
+				Directory.CreateDirectory(Path.GetDirectoryName(settingsFilePath));
+
             // serialize JSON directly to a file
             using (StreamWriter file = File.CreateText(settingsFilePath))
             {
