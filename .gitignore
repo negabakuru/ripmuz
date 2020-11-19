@@ -352,3 +352,7 @@ MigrationBackup/
 Ripmuz/ThirdPartyBin/*
 
 Ripmuz/Ripmuz.exe
+
+RipmuzSetup/RipmuzSetup-cache/
+
+*.msi
