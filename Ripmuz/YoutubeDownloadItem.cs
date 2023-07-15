@@ -11,6 +11,7 @@ using YoutubeDLSharp.Options;
 
 using Xabe.FFmpeg;
 using Xabe.FFmpeg.Events;
+using Xabe.FFmpeg.Exceptions;
 
 namespace Ripmuz
 {
@@ -40,11 +41,9 @@ namespace Ripmuz
 
 		protected VideoData VideoData;
 		protected string Url;
-		protected string SafeFilenameNoExt;
 		protected string OutputFilePath;
 		protected string TempFilePath;
 		protected float Duration;
-		private string _tempFilePath;
 
 
 		//
@@ -56,7 +55,7 @@ namespace Ripmuz
 			{
 				YoutubeDLPath = Form1.Settings.YtDlpPath,
 				FFmpegPath = Form1.Settings.FfmpegPath,
-				OutputFolder = Form1.Settings.DestinationFolder,
+				OutputFolder = Form1.TempFolderPath,
 				OverwriteFiles = true
 			};
 
@@ -106,10 +105,6 @@ namespace Ripmuz
 			var album = res.Data.Album;
 			albumTextBox.Text = album;
 
-			SafeFilenameNoExt = title;
-			foreach (var c in Path.GetInvalidFileNameChars())
-				SafeFilenameNoExt = SafeFilenameNoExt.Replace(c, ' ');
-
 			if (res.Data.Duration != null)
 				Duration = (float)res.Data.Duration;
 			var endTime = TimeSpan.FromSeconds(Duration);
@@ -156,15 +151,17 @@ namespace Ripmuz
 				AudioFormat = AudioConversionFormat.Best,
 				AudioQuality = 0,
 				EmbedThumbnail = true,
-				Output = Form1.TempFolderPath + "%(title)s_temp.%(ext)s",
 			};
 
 			try
 			{
 				var res = await YtDlp.RunAudioDownload(Url, AudioConversionFormat.Best, _downloadCancellationTokenSource.Token, _downloadProgress,
 					_downloadProgressOutput, options);
-				_tempFilePath = res.Data;
-				var safeFileName = SafeFilenameNoExt + Path.GetExtension(_tempFilePath);
+				TempFilePath = res.Data + ".temp";
+				if (File.Exists(TempFilePath))
+					File.Delete(TempFilePath);
+				File.Move(res.Data, TempFilePath);
+				var safeFileName = Path.GetFileName(res.Data);
 				OutputFilePath = Path.Combine(Form1.Settings.DestinationFolder, safeFileName);
 			}
 			catch (Exception ex)
@@ -192,7 +189,7 @@ namespace Ripmuz
 			//var mediaInfo = await FFmpeg.GetMediaInfo(TempFilePath);
 
 			var conversion = FFmpeg.Conversions.New();
-			conversion.AddParameter($"-i {_tempFilePath}", ParameterPosition.PreInput);
+			conversion.AddParameter($"-i \"{TempFilePath}\"", ParameterPosition.PreInput);
 			if (fromTextBox.Text != "00:00:00" || toTextBox.Text != TimeSpan.FromSeconds(Duration).ToString(@"hh\:mm\:ss"))
 			{
 				conversion.AddParameter($"-ss {fromTextBox.Text}", ParameterPosition.PostInput);
@@ -221,7 +218,7 @@ namespace Ripmuz
 
 				CleanUpFiles();
 			}
-			catch (Exception ex)
+			catch (ConversionException ex)
 			{
 				Status = DlStatus.Idle;
 				statusLabel.Text = $"Error {ex.Message}";
@@ -238,8 +235,8 @@ namespace Ripmuz
 
 		protected void CleanUpFiles()
 		{
-			if (File.Exists(_tempFilePath))
-				File.Delete(_tempFilePath);
+			if (File.Exists(TempFilePath))
+				File.Delete(TempFilePath);
 		}
 
 	}
