@@ -32,18 +32,25 @@
 			this.urlTableLayoutPanel = new System.Windows.Forms.TableLayoutPanel();
 			this.urlTextBox = new System.Windows.Forms.TextBox();
 			this.urlLabel = new System.Windows.Forms.Label();
-			this.chooseDestFolderButton = new System.Windows.Forms.Button();
 			this.destFolderLabel = new System.Windows.Forms.Label();
 			this.splitContainer1 = new System.Windows.Forms.SplitContainer();
 			this.youtubeDownloadPanel = new System.Windows.Forms.FlowLayoutPanel();
+			this.menuStrip1 = new System.Windows.Forms.MenuStrip();
+			this.settingsToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.outputFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.ytdlpFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.ffmpegFolderToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
+			this.autoUpdateYtdlpToolStripMenuItem = new System.Windows.Forms.ToolStripMenuItem();
 			this.richTextBox1 = new System.Windows.Forms.RichTextBox();
 			this.destFolderBrowserDialog = new System.Windows.Forms.FolderBrowserDialog();
+			this.openFileDialog1 = new System.Windows.Forms.OpenFileDialog();
 			this.tableLayoutPanel1.SuspendLayout();
 			this.urlTableLayoutPanel.SuspendLayout();
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).BeginInit();
 			this.splitContainer1.Panel1.SuspendLayout();
 			this.splitContainer1.Panel2.SuspendLayout();
 			this.splitContainer1.SuspendLayout();
+			this.menuStrip1.SuspendLayout();
 			this.SuspendLayout();
 			// 
 			// tableLayoutPanel1
@@ -70,10 +77,9 @@
 			this.urlTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 25.52553F));
 			this.urlTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Percent, 74.47447F));
 			this.urlTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 365F));
-			this.urlTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 103F));
+			this.urlTableLayoutPanel.ColumnStyles.Add(new System.Windows.Forms.ColumnStyle(System.Windows.Forms.SizeType.Absolute, 106F));
 			this.urlTableLayoutPanel.Controls.Add(this.urlTextBox, 1, 0);
 			this.urlTableLayoutPanel.Controls.Add(this.urlLabel, 0, 0);
-			this.urlTableLayoutPanel.Controls.Add(this.chooseDestFolderButton, 3, 0);
 			this.urlTableLayoutPanel.Controls.Add(this.destFolderLabel, 2, 0);
 			this.urlTableLayoutPanel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.urlTableLayoutPanel.Location = new System.Drawing.Point(0, 0);
@@ -89,10 +95,10 @@
 			// 
 			this.urlTextBox.AllowDrop = true;
 			this.urlTextBox.Dock = System.Windows.Forms.DockStyle.Bottom;
-			this.urlTextBox.Location = new System.Drawing.Point(84, 0);
+			this.urlTextBox.Location = new System.Drawing.Point(83, 0);
 			this.urlTextBox.Margin = new System.Windows.Forms.Padding(0);
 			this.urlTextBox.Name = "urlTextBox";
-			this.urlTextBox.Size = new System.Drawing.Size(247, 20);
+			this.urlTextBox.Size = new System.Drawing.Size(245, 20);
 			this.urlTextBox.TabIndex = 4;
 			this.urlTextBox.TextChanged += new System.EventHandler(this.urlTextBox_TextChanged);
 			// 
@@ -102,28 +108,16 @@
 			this.urlLabel.Dock = System.Windows.Forms.DockStyle.Fill;
 			this.urlLabel.Location = new System.Drawing.Point(3, 0);
 			this.urlLabel.Name = "urlLabel";
-			this.urlLabel.Size = new System.Drawing.Size(78, 20);
+			this.urlLabel.Size = new System.Drawing.Size(77, 20);
 			this.urlLabel.TabIndex = 5;
 			this.urlLabel.Text = "Enter URL";
 			this.urlLabel.TextAlign = System.Drawing.ContentAlignment.MiddleCenter;
-			// 
-			// chooseDestFolderButton
-			// 
-			this.chooseDestFolderButton.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.chooseDestFolderButton.Location = new System.Drawing.Point(696, 0);
-			this.chooseDestFolderButton.Margin = new System.Windows.Forms.Padding(0);
-			this.chooseDestFolderButton.Name = "chooseDestFolderButton";
-			this.chooseDestFolderButton.Size = new System.Drawing.Size(104, 20);
-			this.chooseDestFolderButton.TabIndex = 6;
-			this.chooseDestFolderButton.Text = "Choose Folder...";
-			this.chooseDestFolderButton.UseVisualStyleBackColor = true;
-			this.chooseDestFolderButton.Click += new System.EventHandler(this.chooseDestFolderButton_Click);
 			// 
 			// destFolderLabel
 			// 
 			this.destFolderLabel.AutoSize = true;
 			this.destFolderLabel.Dock = System.Windows.Forms.DockStyle.Fill;
-			this.destFolderLabel.Location = new System.Drawing.Point(334, 0);
+			this.destFolderLabel.Location = new System.Drawing.Point(331, 0);
 			this.destFolderLabel.Name = "destFolderLabel";
 			this.destFolderLabel.Size = new System.Drawing.Size(359, 20);
 			this.destFolderLabel.TabIndex = 7;
@@ -142,6 +136,7 @@
 			// 
 			this.splitContainer1.Panel1.AutoScroll = true;
 			this.splitContainer1.Panel1.Controls.Add(this.youtubeDownloadPanel);
+			this.splitContainer1.Panel1.Controls.Add(this.menuStrip1);
 			this.splitContainer1.Panel1.Paint += new System.Windows.Forms.PaintEventHandler(this.splitContainer1_Panel1_Paint);
 			// 
 			// splitContainer1.Panel2
@@ -159,12 +154,62 @@
 			this.youtubeDownloadPanel.AutoSizeMode = System.Windows.Forms.AutoSizeMode.GrowAndShrink;
 			this.youtubeDownloadPanel.Dock = System.Windows.Forms.DockStyle.Top;
 			this.youtubeDownloadPanel.FlowDirection = System.Windows.Forms.FlowDirection.BottomUp;
-			this.youtubeDownloadPanel.Location = new System.Drawing.Point(0, 0);
+			this.youtubeDownloadPanel.Location = new System.Drawing.Point(0, 24);
 			this.youtubeDownloadPanel.Margin = new System.Windows.Forms.Padding(0);
 			this.youtubeDownloadPanel.Name = "youtubeDownloadPanel";
 			this.youtubeDownloadPanel.Size = new System.Drawing.Size(800, 0);
 			this.youtubeDownloadPanel.TabIndex = 5;
 			this.youtubeDownloadPanel.WrapContents = false;
+			// 
+			// menuStrip1
+			// 
+			this.menuStrip1.Items.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.settingsToolStripMenuItem});
+			this.menuStrip1.Location = new System.Drawing.Point(0, 0);
+			this.menuStrip1.Name = "menuStrip1";
+			this.menuStrip1.Size = new System.Drawing.Size(800, 24);
+			this.menuStrip1.TabIndex = 6;
+			this.menuStrip1.Text = "menuStrip1";
+			// 
+			// settingsToolStripMenuItem
+			// 
+			this.settingsToolStripMenuItem.DropDownItems.AddRange(new System.Windows.Forms.ToolStripItem[] {
+            this.outputFolderToolStripMenuItem,
+            this.ytdlpFolderToolStripMenuItem,
+            this.ffmpegFolderToolStripMenuItem,
+            this.autoUpdateYtdlpToolStripMenuItem});
+			this.settingsToolStripMenuItem.Name = "settingsToolStripMenuItem";
+			this.settingsToolStripMenuItem.Size = new System.Drawing.Size(61, 20);
+			this.settingsToolStripMenuItem.Text = "Settings";
+			// 
+			// outputFolderToolStripMenuItem
+			// 
+			this.outputFolderToolStripMenuItem.Name = "outputFolderToolStripMenuItem";
+			this.outputFolderToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+			this.outputFolderToolStripMenuItem.Text = "Output Folder";
+			this.outputFolderToolStripMenuItem.Click += new System.EventHandler(this.outputFolderToolStripMenuItem_Click);
+			// 
+			// ytdlpFolderToolStripMenuItem
+			// 
+			this.ytdlpFolderToolStripMenuItem.Name = "ytdlpFolderToolStripMenuItem";
+			this.ytdlpFolderToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+			this.ytdlpFolderToolStripMenuItem.Text = "yt-dlp Folder";
+			this.ytdlpFolderToolStripMenuItem.Click += new System.EventHandler(this.ytdlpFolderToolStripMenuItem_Click);
+			// 
+			// ffmpegFolderToolStripMenuItem
+			// 
+			this.ffmpegFolderToolStripMenuItem.Name = "ffmpegFolderToolStripMenuItem";
+			this.ffmpegFolderToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+			this.ffmpegFolderToolStripMenuItem.Text = "ffmpeg Folder";
+			this.ffmpegFolderToolStripMenuItem.Click += new System.EventHandler(this.ffmpegFolderToolStripMenuItem_Click);
+			// 
+			// autoUpdateYtdlpToolStripMenuItem
+			// 
+			this.autoUpdateYtdlpToolStripMenuItem.Checked = true;
+			this.autoUpdateYtdlpToolStripMenuItem.CheckState = System.Windows.Forms.CheckState.Checked;
+			this.autoUpdateYtdlpToolStripMenuItem.Name = "autoUpdateYtdlpToolStripMenuItem";
+			this.autoUpdateYtdlpToolStripMenuItem.Size = new System.Drawing.Size(175, 22);
+			this.autoUpdateYtdlpToolStripMenuItem.Text = "Auto update yt-dlp";
 			// 
 			// richTextBox1
 			// 
@@ -181,12 +226,17 @@
 			this.destFolderBrowserDialog.RootFolder = System.Environment.SpecialFolder.MyComputer;
 			this.destFolderBrowserDialog.HelpRequest += new System.EventHandler(this.folderBrowserDialog1_HelpRequest);
 			// 
+			// openFileDialog1
+			// 
+			this.openFileDialog1.FileName = "openFileDialog1";
+			// 
 			// Form1
 			// 
 			this.AutoScaleDimensions = new System.Drawing.SizeF(6F, 13F);
 			this.AutoScaleMode = System.Windows.Forms.AutoScaleMode.Font;
 			this.ClientSize = new System.Drawing.Size(800, 450);
 			this.Controls.Add(this.tableLayoutPanel1);
+			this.MainMenuStrip = this.menuStrip1;
 			this.Name = "Form1";
 			this.Text = "Ripmuz";
 			this.tableLayoutPanel1.ResumeLayout(false);
@@ -197,6 +247,8 @@
 			this.splitContainer1.Panel2.ResumeLayout(false);
 			((System.ComponentModel.ISupportInitialize)(this.splitContainer1)).EndInit();
 			this.splitContainer1.ResumeLayout(false);
+			this.menuStrip1.ResumeLayout(false);
+			this.menuStrip1.PerformLayout();
 			this.ResumeLayout(false);
 			this.PerformLayout();
 
@@ -212,8 +264,14 @@
 		private System.Windows.Forms.FlowLayoutPanel youtubeDownloadPanel;
 		private System.Windows.Forms.RichTextBox richTextBox1;
 		private System.Windows.Forms.FolderBrowserDialog destFolderBrowserDialog;
-		private System.Windows.Forms.Button chooseDestFolderButton;
 		private System.Windows.Forms.Label destFolderLabel;
+		private System.Windows.Forms.MenuStrip menuStrip1;
+		private System.Windows.Forms.ToolStripMenuItem settingsToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem outputFolderToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem ytdlpFolderToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem ffmpegFolderToolStripMenuItem;
+		private System.Windows.Forms.ToolStripMenuItem autoUpdateYtdlpToolStripMenuItem;
+		private System.Windows.Forms.OpenFileDialog openFileDialog1;
 	}
 }
 
